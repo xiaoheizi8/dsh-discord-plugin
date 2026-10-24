@@ -4,7 +4,6 @@ import { Card, PageHeader, StatusDot, CopyButton } from '../components/ui.jsx';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import Tooltip from '@mui/material/Tooltip';
-import Chip from '@mui/material/Chip';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import IconButton from '@mui/material/IconButton';
 

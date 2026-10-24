@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { Card, PageHeader, CopyButton } from '../components/ui.jsx';
+import { Card, PageHeader } from '../components/ui.jsx';
 import { toast } from '../toast.jsx';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
@@ -89,22 +89,23 @@ export default function Whitelist() {
         </div>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mb: 1.25, minHeight: 32 }}>
           {list.map((id, i) => (
-            <Chip
-              key={`${id}.${i}`}
-              label={id}
-              size="small"
-              onDelete={() => delItem(listKey, g.key, i)}
-              icon={
-                <Box sx={{ ml: 0.75, display: 'flex' }}>
-                  <CopyButton text={id} tooltip="复制 ID" size="small" />
-                </Box>
-              }
-              sx={{
-                transition: 'all .15s ease',
-                '&:hover': { bgcolor: 'rgba(237,66,69,0.08)', borderColor: 'rgba(237,66,69,0.4)' },
-                '& .MuiChip-deleteIcon': { color: '#8b93a7', '&:hover': { color: '#ed4245' } },
-              }}
-            />
+            <Tooltip key={`${id}.${i}`} title="点击复制 ID">
+              <Chip
+                label={id}
+                size="small"
+                onClick={async () => {
+                  try { await navigator.clipboard.writeText(id); toast('已复制到剪贴板', 'success'); }
+                  catch { toast('复制失败', 'error'); }
+                }}
+                onDelete={() => delItem(listKey, g.key, i)}
+                sx={{
+                  transition: 'all .15s ease',
+                  cursor: 'copy',
+                  '&:hover': { bgcolor: 'rgba(88,101,242,0.12)', borderColor: 'primary.main' },
+                  '& .MuiChip-deleteIcon': { color: '#8b93a7', '&:hover': { color: '#ed4245' } },
+                }}
+              />
+            </Tooltip>
           ))}
           {list.length === 0 && <span className="text-[12.5px] text-[#8b93a7]">（空）</span>}
         </Box>

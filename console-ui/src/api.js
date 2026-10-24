@@ -17,6 +17,12 @@ async function request(path, options = {}) {
       ...(options.headers ?? {}),
     },
   });
+  // token 失效：清掉记住的令牌，回到引导页重新输入
+  if (res.status === 401) {
+    localStorage.removeItem('dshConsoleToken');
+    window.location.replace('/');
+    throw new Error('控制台令牌已失效，请重新输入');
+  }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
   return data;

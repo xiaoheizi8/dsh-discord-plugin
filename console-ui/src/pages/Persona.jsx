@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { Card, PageHeader, ConfirmDialog } from '../components/ui.jsx';
 import { toast } from '../toast.jsx';
@@ -23,7 +23,7 @@ export default function Persona() {
       .catch((e) => toast(e.message, 'error'));
   }, []);
 
-  const changed = data !== null && draft !== data.prefix;
+  const dirty = data !== null && draft !== data.prefix;
 
   const save = async () => {
     setSaving(true);
@@ -52,7 +52,7 @@ export default function Persona() {
   return (
     <>
       <PageHeader title="人格" sub={`preset: ${data.preset} · 源文件 agent.cordis.yml 同步更新`}>
-        {changed && (
+        {dirty && (
           <Chip size="small" color="warning" variant="outlined" label="● 未保存" sx={{ fontFamily: 'inherit' }} />
         )}
         <Button

@@ -12,6 +12,7 @@ import DialogActions from '@mui/material/DialogActions';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 
 /** 卡片容器：统一圆角 / 描边 / 悬浮微动效。 */
 export function Card({ children, className = '', sx, ...rest }) {
@@ -90,12 +91,29 @@ export function CopyButton({ text, tooltip = '复制', size = 'small' }) {
   );
 }
 
-/** 危险操作确认对话框。 */
+/** 危险操作确认对话框：onConfirm 返回 Promise 时，按钮进入加载态且完成前不关弹窗。 */
 export function ConfirmDialog({ open, title, text, confirmText = '确认', danger, onConfirm, onClose }) {
+  const [busy, setBusy] = useState(false);
+
+  const handleConfirm = async () => {
+    try {
+      const r = onConfirm?.();
+      if (r && typeof r.then === 'function') {
+        setBusy(true);
+        await r;
+      }
+      onClose?.();
+    } catch {
+      /* 失败时保持弹窗打开（调用方应已 toast 报错） */
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={(e, reason) => { if (reason !== 'backdropClick' || !busy) onClose?.(); }}
       PaperProps={{ elevation: 0 }}
       TransitionProps={{ mountOnEnter: true, unmountOnExit: true }}
     >
@@ -104,14 +122,16 @@ export function ConfirmDialog({ open, title, text, confirmText = '确认', dange
         <DialogContentText sx={{ color: 'text.secondary', maxWidth: 420 }}>{text}</DialogContentText>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={onClose} color="inherit">取消</Button>
+        <Button onClick={onClose} color="inherit" disabled={busy}>取消</Button>
         <Button
-          onClick={() => { onConfirm?.(); onClose?.(); }}
+          onClick={handleConfirm}
+          disabled={busy}
           variant="contained"
           color={danger ? 'error' : 'primary'}
+          startIcon={busy ? <CircularProgress size={16} color="inherit" /> : undefined}
           autoFocus
         >
-          {confirmText}
+          {busy ? '处理中…' : confirmText}
         </Button>
       </DialogActions>
     </Dialog>
