@@ -11,6 +11,9 @@
 ![Node](https://img.shields.io/badge/node-%E2%89%A522.13-339933?logo=node.js&logoColor=white)
 ![DSH](https://img.shields.io/badge/DSH-0.2.1-4D6BFF)
 ![Discord.js](https://img.shields.io/badge/discord.js-v14-5865F2?logo=discord&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?logo=tailwindcss&logoColor=white)
+![MUI](https://img.shields.io/badge/MUI-9-007FFF?logo=mui&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 </div>
@@ -59,20 +62,21 @@ flowchart LR
 
 ## 🖥️ 可视化控制台
 
-桥接进程内置 SnowLuma 风格的本地 WebUI（React 19 + react-router 构建），启动后监听 **`http://127.0.0.1:8310`**（端口可改 `consolePort`）：
+桥接进程内置 SnowLuma 风格的本地 WebUI（**React 19 + Tailwind CSS v4 + MUI 9** 暗色主题），启动后监听 **`http://127.0.0.1:8310`**（端口可改 `consolePort`）：
 
 | 页签 | 功能 |
 |---|---|
-| **仪表盘** | Discord/DSH 在线状态、活跃会话数、排队数、已接入服务器 |
-| **白名单** | 服务器/频道/用户三级白黑名单可视化增删，保存即**热生效**（无需重启桥接） |
-| **会话** | 所有活跃会话列表（回合中/空闲/排队数），一键重置 |
-| **人格** | 可视化编辑 persona 前缀，保存自动重渲染 DSH bundle（重启 DSH 后生效） |
-| **日志** | 桥接日志实时滚动（最近 500 条），支持暂停/清屏 |
+| **仪表盘** | Discord/DSH 在线状态脉冲指示、活跃会话/排队/模型/运行时长统计卡、已接入服务器卡片（一键复制 ID） |
+| **白名单** | 服务器/频道/用户三级白黑名单可视化增删（Chip 标签、ID 一键复制），保存即**热生效**（无需重启桥接），未保存提示 |
+| **会话** | 活跃会话列表（回合中/空闲/排队数），重置走确认弹窗，频道标识一键复制 |
+| **人格** | 编辑 persona 前缀，脏状态检测 + 撤销修改 + 字符统计，保存自动重渲染 DSH bundle（重启 DSH 后生效） |
+| **日志** | 实时滚动（最近 500 条），**等级过滤**（成功/警告/错误）+ 关键字搜索 + 统计徽章 + 复制当前日志 + 智能滚动跟随 |
 
-- **访问方式**：桥接启动日志会打印带完整令牌的一键链接，复制到浏览器打开一次即自动记住
+- **访问方式**：① 桥接启动日志打印带令牌的一键链接，复制到浏览器打开即自动记住；② 或在进入页直接**粘贴 consoleToken**（先自动验证有效才记住）
 - **安全**：只监听 `127.0.0.1`，API 需要 `consoleToken`（首次启动自动生成写入 config.json）
-- 端口被占用时自动 +1 顺延（3101、3102…），不影响桥接收发消息
-- 前端源码在 `console-ui/`（Vite + React 19 + react-router），构建产物 `web/` 随仓库提交；改前端后跑 `npm run build:console`
+- **微交互**：全局 Snackbar 通知、危险操作二次确认、复制按钮点击变 ✓、骨架屏加载、卡片悬浮动效、导航高亮滑条
+- 端口被占用时自动 +1 顺延（8311、8312…），不影响桥接收发消息
+- 前端源码在 `console-ui/`（Vite + React 19 + react-router + Tailwind + MUI），构建产物 `web/` 随仓库提交；改前端后跑 `npm run build:console`
 
 ## 📁 目录结构
 
@@ -85,7 +89,7 @@ flowchart LR
 │   ├── proxy-bootstrap.mjs  # 代理引导：REST(undici) + 网关 WebSocket(ws)，127.0.0.1 直连
 │   ├── console.mjs          # 本地控制台：HTTP 服务器 + REST API + 静态托管 web/
 │   └── preset-build.mjs     # preset 源 → DSH bundle patch 渲染（setup 与控制台共用）
-├── 📂 console-ui/           # 控制台前端源码（Vite + React）
+├── 📂 console-ui/           # 控制台前端源码（Vite + React + Tailwind CSS v4 + MUI）
 ├── 📂 web/                  # 控制台构建产物（随仓库提交，clone 即用）
 ├── 📂 dsh/agent-presets/discord-chat/   # 最小权限 preset 源文件（无任何本地工具）
 ├── 📂 scripts/
@@ -247,8 +251,9 @@ Discord 已连接：你的Bot名#xxxx
 ## 🔀 与 qq-bridge 的差异
 
 - Discord 侧基于官方 Bot API（discord.js v14），无 QQ 生态的风控/语音/表情库复杂度
-- 不含社交仿真、黑话学习、Web 控制台、token 计费看板——需要时可从 qq-bridge 移植
+- 不含社交仿真、黑话学习、token 计费看板——需要时可从 qq-bridge 移植
 - 回复 Markdown 直通（QQ 需转纯文本）；提问/审批用原生按钮而非文本解析
+- 自带暗色可视化控制台（React + Tailwind CSS v4 + MUI，白名单/会话/人格/日志全图形化）
 - DSH 客户端不依赖 `@deepseek-ai/dsh-host-apiproxy`，基类手搓，运行依赖仅 4 个 npm 包
 - 内置国内网络代理方案（REST + WebSocket 双通道，系统代理自动检测）
 
