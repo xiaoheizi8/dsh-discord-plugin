@@ -9,7 +9,7 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "start": "node src/bridge.mjs",
+    "start": "node --use-system-ca src/bridge.mjs",
     "setup-dsh": "node scripts/setup-dsh.mjs",
     "self-test": "node scripts/self-test.mjs"
   },
