@@ -1,0 +1,54 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="dsh-discord-plugin logo">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5865F2"/>
+      <stop offset="55%" stop-color="#6D5BF5"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <linearGradient id="stroke" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#DDE6FF"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="30%" cy="22%" r="70%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="60%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#1E1B4B" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="116" fill="url(#glow)"/>
+
+  <!-- 悬索桥：桥面 + 主缆 + 吊索 -->
+  <g filter="url(#soft)">
+    <!-- 桥面 -->
+    <path d="M96 330 H416" stroke="url(#stroke)" stroke-width="18" stroke-linecap="round"/>
+    <!-- 主缆 -->
+    <path d="M96 330 C 160 178, 352 178, 416 330" fill="none" stroke="url(#stroke)" stroke-width="18" stroke-linecap="round"/>
+    <!-- 吊索 -->
+    <path d="M160 330 V 243" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round" opacity="0.75"/>
+    <path d="M256 330 V 219" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round" opacity="0.75"/>
+    <path d="M352 330 V 243" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round" opacity="0.75"/>
+
+    <!-- 左节点：Discord 气泡（实心） -->
+    <circle cx="96" cy="330" r="44" fill="#FFFFFF"/>
+    <path d="M78 318 a8 8 0 1 1 0.01 0 M78 318 a8 8 0 1 0 0.01 0" fill="none"/>
+    <circle cx="82" cy="326" r="7.5" fill="#5865F2"/>
+    <circle cx="110" cy="326" r="7.5" fill="#5865F2"/>
+    <path d="M70 344 q 26 14 52 0" fill="none" stroke="#5865F2" stroke-width="7" stroke-linecap="round"/>
+
+    <!-- 右节点：DeepSeek 智能核（描边圆 + 内核） -->
+    <circle cx="416" cy="330" r="44" fill="none" stroke="#FFFFFF" stroke-width="12"/>
+    <circle cx="416" cy="330" r="15" fill="#FFFFFF"/>
+
+    <!-- 数据流：主缆上的流动小点 -->
+    <circle cx="208" cy="223" r="10" fill="#FFFFFF" opacity="0.9"/>
+    <circle cx="304" cy="223" r="10" fill="#FFFFFF" opacity="0.9"/>
+  </g>
+
+  <!-- 底部品牌弧线点缀 -->
+  <path d="M136 408 Q 256 372 376 408" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" opacity="0.35"/>
+</svg>

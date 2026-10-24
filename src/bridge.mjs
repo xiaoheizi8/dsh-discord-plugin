@@ -15,7 +15,6 @@
 import './proxy-bootstrap.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import {
   Client, GatewayIntentBits, Partials, Events,
   ActionRowBuilder, ButtonBuilder, ButtonStyle,
@@ -23,9 +22,8 @@ import {
 import { NodeApiClient, createTurnCollector, unwrap } from './dsh-client.mjs';
 import { chunkForDiscord, normalizeDiscordText } from './discord-format.mjs';
 import { startConsole } from './console.mjs';
+import { ROOT } from './paths.mjs';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '..');
 const STATE_DIR = path.join(ROOT, 'state');
 
 // ── 配置 ────────────────────────────────────────────────────────────────────

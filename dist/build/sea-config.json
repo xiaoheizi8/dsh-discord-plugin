@@ -1,0 +1,5 @@
+{
+  "main": "D:\\workspace\\DC-Plugin\\dsh-discord-plugin\\dist\\build\\sea.cjs",
+  "output": "D:\\workspace\\DC-Plugin\\dsh-discord-plugin\\dist\\build\\sea-prep.blob",
+  "disableExperimentalSEAWarning": true
+}

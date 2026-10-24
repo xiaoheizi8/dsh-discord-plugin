@@ -4,4 +4,4 @@ state/
 *.log
 
 .workbuddy/
-console-ui/node_modules/
+console-ui/node_modules/dist/

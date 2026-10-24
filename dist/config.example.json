@@ -1,0 +1,36 @@
+{
+  "discord": {
+    "token": "在这里粘贴你的 Discord Bot Token",
+    "ackReaction": "",
+    "proxy": "auto"
+  },
+  "dsh": {
+    "baseUrl": "http://127.0.0.1:3080",
+    "provider": "deepseek-official",
+    "model": "deepseek-flash",
+    "reasoningEffort": "max",
+    "authToken": "",
+    "allowRemote": false
+  },
+  "agentPreset": "discord-chat",
+  "workspaceTitle": "Discord 聊天",
+  "sessionCwd": "",
+  "allow": {
+    "guilds": [],
+    "channels": [],
+    "users": []
+  },
+  "deny": {
+    "guilds": [],
+    "channels": [],
+    "users": []
+  },
+  "allowAllWhenEmpty": false,
+  "maxQueuePerSession": 50,
+  "questionTimeoutMs": 300000,
+  "maxMediaBytes": 8388608,
+  "maxMediaCount": 5,
+  "pollIntervalMs": 5000,
+  "consolePort": 8310,
+  "consoleToken": ""
+}

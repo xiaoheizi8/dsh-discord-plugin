@@ -12,16 +12,14 @@
 import https from 'node:https';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { ProxyAgent, EnvHttpProxyAgent, setGlobalDispatcher } from 'undici';
 import { HttpsProxyAgent } from 'https-proxy-agent';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import { ROOT } from './paths.mjs';
 
 function readProxyFromConfig() {
   try {
-    const configPath = process.env.CONFIG_PATH || path.join(__dirname, '..', 'config.json');
+    const configPath = process.env.CONFIG_PATH || path.join(ROOT, 'config.json');
     const cfg = JSON.parse(fs.readFileSync(configPath, 'utf8'));
     return cfg?.discord?.proxy;
   } catch {

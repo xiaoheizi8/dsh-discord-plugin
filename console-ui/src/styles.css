@@ -20,7 +20,18 @@ body {
   color: var(--text);
   font-family: -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
   font-size: 14px;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* 全局滚动条 */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: #2c3345; border-radius: 5px; border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: #3a4359; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* 页面淡入动画 */
+.content > * { animation: fadeIn .25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
 .layout { display: flex; min-height: 100vh; }
 
@@ -66,7 +77,9 @@ h3 { font-size: 14px; margin: 14px 0 10px; }
 .card {
   background: var(--panel); border: 1px solid var(--border);
   border-radius: 12px; padding: 18px 20px; margin-bottom: 16px;
+  transition: border-color .15s;
 }
+.card:hover { border-color: #323a4f; }
 .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 16px; }
 .card.stat { margin-bottom: 0; }
 .stat-label { font-size: 12px; color: var(--muted); }
@@ -103,8 +116,9 @@ input, textarea {
   background: var(--panel2); border: 1px solid var(--border);
   color: var(--text); border-radius: 8px; padding: 9px 12px;
   font-size: 13px; outline: none; font-family: inherit;
+  transition: border-color .15s, box-shadow .15s;
 }
-input:focus, textarea:focus { border-color: var(--accent); }
+input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(88, 101, 242, .18); }
 
 button {
   background: var(--panel2); border: 1px solid var(--border);
@@ -112,6 +126,7 @@ button {
   cursor: pointer; font-size: 13px; transition: all .15s;
 }
 button:hover { border-color: var(--accent); }
+button:active { transform: scale(.97); }
 button.primary { background: var(--accent); border-color: var(--accent); font-weight: 600; }
 button.primary:hover { background: var(--accent2); }
 button.primary:disabled { opacity: .5; cursor: wait; }

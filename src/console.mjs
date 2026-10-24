@@ -13,12 +13,11 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
 import { readPersona, writePersona, writeBundle, resolveDshHome, PRESET_ID } from './preset-build.mjs';
+import { ROOT } from './paths.mjs';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const WEB_DIR = path.resolve(__dirname, '..', 'web');
+const WEB_DIR = path.join(ROOT, 'web');
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png',

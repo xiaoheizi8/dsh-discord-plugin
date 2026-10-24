@@ -4,20 +4,17 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
+import { ROOT, PRESET_SRC_DIR } from './paths.mjs';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-export const REPO_ROOT = path.resolve(__dirname, '..');
-export const SRC_DIR = path.join(REPO_ROOT, 'dsh', 'agent-presets', 'discord-chat');
+export const REPO_ROOT = ROOT;
+export const SRC_DIR = PRESET_SRC_DIR;
 export const BUNDLE_NAME = 'discord-agent-presets';
 export const PRESET_ID = 'discord-chat';
 
 export function resolveDshHome() {
   return process.env.DSH_HOME || path.join(os.homedir(), '.dsh');
 }
-
-/** 读 persona prefix（控制台展示/编辑用）。 */
 export function readPersona() {
   const rows = yaml.load(fs.readFileSync(path.join(SRC_DIR, 'agent.cordis.yml'), 'utf8'));
   const persona = rows.find((r) => r?.id === 'persona');
