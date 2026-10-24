@@ -62,9 +62,8 @@ export function startConsole(ctx) {
         }
       });
       server.listen(p, '127.0.0.1', () => {
-        const base = `http://127.0.0.1:${p}`;
-        if (attempts > 0) log(`🖥️ 控制台已改用新端口: ${base}/?token=${cfg.consoleToken.slice(0, 8)}…`);
-        else log(`🖥️ 控制台已启动: ${base}/?token=${cfg.consoleToken.slice(0, 8)}…（完整 token 在 config.json 的 consoleToken）`);
+        const url = `http://127.0.0.1:${p}/?token=${cfg.consoleToken}`;
+        log(`🖥️ 控制台已启动，一键访问（含令牌，浏览器会记住）：${url}`);
         resolve(server);
       });
     };

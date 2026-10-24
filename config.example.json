@@ -30,5 +30,7 @@
   "questionTimeoutMs": 300000,
   "maxMediaBytes": 8388608,
   "maxMediaCount": 5,
-  "pollIntervalMs": 5000
+  "pollIntervalMs": 5000,
+  "consolePort": 8310,
+  "consoleToken": ""
 }
