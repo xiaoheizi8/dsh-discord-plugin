@@ -12,6 +12,7 @@
 // 安全：白名单 fail-closed（allowAllWhenEmpty=false 且名单为空时不响应任何消息）；
 // agentPreset 配置了但 DSH 里不存在时拒绝建会话（绝不回退到带本地工具的默认 preset）。
 
+import './proxy-bootstrap.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

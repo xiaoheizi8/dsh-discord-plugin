@@ -67,6 +67,7 @@ scripts/
 |---|---|
 | `discord.token` | Discord Bot Token（必填） |
 | `discord.ackReaction` | 收到消息时的表情回应（如 `"🫡"`），留空关闭 |
+| `discord.proxy` | 代理地址（如 `http://127.0.0.1:7890`）；`"env"` 表示用 `HTTPS_PROXY` 环境变量；留空直连。国内网络必配，DSH 的 127.0.0.1 调用永远直连不受影响 |
 | `dsh.baseUrl` | DSH 地址，默认 `http://127.0.0.1:3080` |
 | `dsh.provider` / `dsh.model` / `dsh.reasoningEffort` | 会话模型，默认 `deepseek-official` / `deepseek-flash` / `max` |
 | `dsh.authToken` | 通常留空（走离线铸造）；显式填写则尊重该意图 |
