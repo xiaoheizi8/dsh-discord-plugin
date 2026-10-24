@@ -159,3 +159,8 @@ th { color: var(--muted); font-weight: 500; font-size: 12px; }
   background: linear-gradient(135deg, #5865f2, #8b5cf6);
   display: flex; align-items: center; justify-content: center; font-weight: 600;
 }
+
+/* ── 页头（标题 + 右侧动作区）── */
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.page-header h2 { margin-bottom: 0; }
+.page-header-actions { display: flex; align-items: center; gap: 8px; }
