@@ -59,7 +59,7 @@ flowchart LR
 
 ## 🖥️ 可视化控制台
 
-桥接进程内置 SnowLuma 风格的本地 WebUI（React 构建），启动后自动监听 **`http://127.0.0.1:3100`**：
+桥接进程内置 SnowLuma 风格的本地 WebUI（React 19 + react-router 构建），启动后监听 **`http://127.0.0.1:8310`**（端口可改 `consolePort`）：
 
 | 页签 | 功能 |
 |---|---|
@@ -69,8 +69,10 @@ flowchart LR
 | **人格** | 可视化编辑 persona 前缀，保存自动重渲染 DSH bundle（重启 DSH 后生效） |
 | **日志** | 桥接日志实时滚动（最近 500 条），支持暂停/清屏 |
 
-- **安全**：只监听 `127.0.0.1`，API 需要 `consoleToken`（首次启动自动生成写入 config.json）；第一次访问用 `http://127.0.0.1:3100/?token=<consoleToken>`，之后浏览器会记住
-- 前端源码在 `console-ui/`（Vite + React），构建产物 `web/` 随仓库提交；改前端后跑 `npm run build:console`
+- **访问方式**：桥接启动日志会打印带完整令牌的一键链接，复制到浏览器打开一次即自动记住
+- **安全**：只监听 `127.0.0.1`，API 需要 `consoleToken`（首次启动自动生成写入 config.json）
+- 端口被占用时自动 +1 顺延（3101、3102…），不影响桥接收发消息
+- 前端源码在 `console-ui/`（Vite + React 19 + react-router），构建产物 `web/` 随仓库提交；改前端后跑 `npm run build:console`
 
 ## 📁 目录结构
 
@@ -88,10 +90,33 @@ flowchart LR
 ├── 📂 dsh/agent-presets/discord-chat/   # 最小权限 preset 源文件（无任何本地工具）
 ├── 📂 scripts/
 │   ├── setup-dsh.mjs        # 从源渲染 patch，以 bundle 机制注册进 DSH profile（幂等）
+│   ├── build-exe.mjs        # SEA 单文件 exe 打包（npm run build:exe）
 │   ├── self-test.mjs        # 离线自测（10 例，不需要 Discord/DSH）
 │   └── test-console-api.mjs # 控制台 API 端到端回归（15 例）
 └── 📂 state/                # 运行时数据（不入库）：sessions.json + 会话工作目录
 ```
+
+## ⚡ 一键启动 exe
+
+不想装 Node / 不想敲命令？把整个项目打包成单个 exe：
+
+```bash
+npm run build:exe
+```
+
+产物 `dist/`：
+
+```
+dist/
+├── dsh-discord.exe    # 双击启动（88MB，内嵌 Node 22 运行时）
+├── config.json        # 首次自动生成，填 discord.token
+├── web/               # 控制台前端
+└── dsh/               # preset 源（控制台里改人格改的就是它）
+```
+
+- 双击 `dsh-discord.exe` → 桥接启动 → **自动弹出控制台浏览器页面**
+- `config.json` / `state/` / `dsh/` 都在 exe 旁边，换电脑拷整个 `dist/` 文件夹即可
+- 基于.Node 官方 SEA（Single Executable Application）方案，无第三方打包器
 
 ## 🚀 部署
 
