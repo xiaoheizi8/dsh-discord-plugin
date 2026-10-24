@@ -13,6 +13,7 @@ import https from 'node:https';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 import { ProxyAgent, EnvHttpProxyAgent, setGlobalDispatcher } from 'undici';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 
@@ -28,10 +29,46 @@ function readProxyFromConfig() {
   }
 }
 
-const configured = readProxyFromConfig();
+/** 读取 Windows 系统代理（Internet 选项里那个开关）；未开启/非 Windows 返回 ''。 */
+function readWindowsSystemProxy() {
+  if (process.platform !== 'win32') return '';
+  try {
+    const out = execFileSync(
+      'reg',
+      ['query', 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings'],
+      { encoding: 'utf8', timeout: 3000, stdio: ['ignore', 'pipe', 'ignore'] }
+    );
+    if (!/ProxyEnable\s+REG_DWORD\s+0x1/.test(out)) return '';
+    const m = out.match(/ProxyServer\s+REG_SZ\s+(\S+)/);
+    if (!m) return '';
+    let server = m[1];
+    // 形如 "http=127.0.0.1:7890;https=127.0.0.1:7890;ftp=..." 时取 https 段
+    if (server.includes(';') || server.includes('=')) {
+      const parts = Object.fromEntries(server.split(';').map((s) => s.split('=', 2)).filter((p) => p.length === 2));
+      server = parts.https || parts.http || '';
+    }
+    if (!server || server === '127.0.0.1' || server === 'localhost') return '';
+    return /^https?:\/\//.test(server) ? server : `http://${server}`;
+  } catch {
+    return '';
+  }
+}
+
 const fromEnv = process.env.HTTPS_PROXY || process.env.https_proxy
   || process.env.HTTP_PROXY || process.env.http_proxy;
-const proxyUrl = (configured && configured !== 'env' ? configured : fromEnv) || '';
+
+// 代理来源优先级：
+//   显式地址 > "env"（只认环境变量） > "auto"（默认：环境变量 > Windows 系统代理） > ""（直连）
+const configured = readProxyFromConfig();
+const mode = configured ?? 'auto';
+let proxyUrl = '';
+if (mode && !['env', 'auto', ''].includes(mode)) {
+  proxyUrl = mode;
+} else if (mode === 'env') {
+  proxyUrl = fromEnv || '';
+} else {
+  proxyUrl = fromEnv || readWindowsSystemProxy();
+}
 
 // DSH 在本机，绝不能走代理
 if (!process.env.NO_PROXY && !process.env.no_proxy) {
@@ -44,10 +81,10 @@ if (proxyUrl) {
   setGlobalDispatcher(new EnvHttpProxyAgent());
   // 2) 网关 WebSocket：ws 包缺省走 https.globalAgent，换成代理 agent
   https.globalAgent = new HttpsProxyAgent(proxyUrl);
-  // 配置了显式代理时同步进环境变量，让 EnvHttpProxyAgent 生效
+  // 同步进环境变量，让 EnvHttpProxyAgent 生效
   process.env.HTTPS_PROXY = process.env.https_proxy = proxyUrl;
   process.env.HTTP_PROXY = process.env.http_proxy = proxyUrl;
-  console.log(`[proxy] 已启用代理: ${proxyUrl}（REST + 网关 WebSocket；127.0.0.1 直连）`);
+  console.log(`[proxy] 已启用代理: ${proxyUrl}（来源：${mode === 'auto' ? (fromEnv ? '环境变量' : 'Windows 系统代理') : mode}；REST + 网关 WebSocket；127.0.0.1 直连）`);
 } else {
-  console.log('[proxy] 未配置代理（discord.proxy / HTTPS_PROXY 均为空），直连 Discord——国内网络可能无法连接');
+  console.log('[proxy] 未配置代理（discord.proxy / HTTPS_PROXY / Windows 系统代理均为空），直连 Discord——国内网络可能无法连接');
 }

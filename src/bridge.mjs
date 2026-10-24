@@ -747,7 +747,19 @@ async function main() {
     console.error('config.json 缺少 discord.token，无法启动。');
     process.exit(1);
   }
-  await discord.login(cfg.discord.token);
+  log('正在连接 Discord 网关…（超过 30 秒无下文通常是代理/VPN 未连通）');
+  const loginHint = setTimeout(() => {
+    log('⚠️ 30 秒仍未连上 Discord：请确认 VPN/代理可用（浏览器能否打开 discord.com），'
+      + '或在 config.json 的 discord.proxy 里显式填写代理地址，如 "http://127.0.0.1:7890"');
+  }, 30000);
+  loginHint.unref?.();
+  try {
+    await discord.login(cfg.discord.token);
+  } catch (error) {
+    log('❌ Discord 登录失败:', error?.message ?? error);
+    process.exit(1);
+  }
+  clearTimeout(loginHint);
   pumpMux().catch((error) => {
     log('事件泵退出:', error?.message ?? error);
     process.exitCode = 1;
