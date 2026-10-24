@@ -35,9 +35,9 @@ src/
   dsh-client.mjs       # 自包含 DSH API 客户端（Cookie 铸造 + 斜杠 RPC + remote.mux + turn collector）
   discord-format.mjs   # 2000 字符分块（代码块安全）、@提及/频道/表情归一化
   proxy-bootstrap.mjs  # 代理引导：REST(undici) + 网关 WebSocket(ws) 统一走代理；127.0.0.1 直连
-dsh/agent-presets/discord-chat/   # 最小权限 preset（无任何本地工具）
+dsh/agent-presets/discord-chat/   # 最小权限 preset 源文件（无任何本地工具）
 scripts/
-  setup-dsh.mjs        # 把 preset 装到 ~/.dsh/.agent-presets/（幂等）
+  setup-dsh.mjs        # 从源渲染 patch 并以 bundle 机制注册进 DSH profile（幂等）
   self-test.mjs        # 离线自测（npm run self-test，不需要 Discord/DSH）
 state/
   sessions.json        # 频道 ↔ DSH 会话映射（运行时生成，勿提交）
@@ -62,9 +62,11 @@ state/
 
 ```bash
 npm install
-npm run setup-dsh    # 把 discord-chat preset 装进 ~/.dsh/.agent-presets/
+npm run setup-dsh    # 把 discord-chat preset 以 bundle 机制装进 DSH profile（~/.dsh/plugins/discord-agent-presets）
 # ⚠️ 重启 DSH 使 preset 生效——不重启会因 fail-closed 拒绝建会话（频道里毫无反应）
 ```
+
+> 机制说明：DSH 0.1.7 起 `~/.dsh/.agent-presets/` 目录已废弃不再读取，preset 由 profile 里 bundle 的 patch 文件插入（一条 `@deepseek-ai/dsh-agent-preset` 行）。本脚本的源文件在 `dsh/agent-presets/discord-chat/`（改人格/工具面只改那里），安装时自动渲染成 patch 并注册进所有 profile。
 
 ### 3. 配置
 
