@@ -37,23 +37,38 @@ export function startConsole(ctx) {
   }
   const port = cfg.consolePort || 3100;
 
-  const server = http.createServer(async (req, res) => {
-    const url = new URL(req.url, 'http://127.0.0.1');
-    try {
-      if (url.pathname.startsWith('/api/')) return await handleApi(req, res, url, ctx);
-      return serveStatic(req, res, url);
-    } catch (error) {
-      res.writeHead(500, { 'content-type': 'application/json; charset=utf-8' });
-      res.end(JSON.stringify({ error: error?.message ?? String(error) }));
-    }
-  });
-
   return new Promise((resolve) => {
-    server.listen(port, '127.0.0.1', () => {
-      const base = `http://127.0.0.1:${port}`;
-      log(`🖥️ 控制台已启动: ${base}/?token=${cfg.consoleToken.slice(0, 8)}…（完整 token 在 config.json 的 consoleToken）`);
-      resolve(server);
-    });
+    // 端口被占用时自动 +1 重试（最多 10 次），绝不因控制台挂掉整个桥。
+    let attempts = 0;
+    const tryListen = (p) => {
+      const server = http.createServer(async (req, res) => {
+        const u = new URL(req.url, 'http://127.0.0.1');
+        try {
+          if (u.pathname.startsWith('/api/')) return await handleApi(req, res, u, ctx);
+          return serveStatic(req, res, u);
+        } catch (error) {
+          res.writeHead(500, { 'content-type': 'application/json; charset=utf-8' });
+          res.end(JSON.stringify({ error: error?.message ?? String(error) }));
+        }
+      });
+      server.on('error', (error) => {
+        if (error?.code === 'EADDRINUSE' && attempts < 10) {
+          attempts += 1;
+          log(`⚠️ 控制台端口 ${p} 已被占用（可能上一个桥接还没关），尝试 ${p + 1}…`);
+          tryListen(p + 1);
+        } else {
+          log(`⚠️ 控制台启动失败（不影响桥接消息收发）: ${error?.message ?? error}`);
+          resolve(null);
+        }
+      });
+      server.listen(p, '127.0.0.1', () => {
+        const base = `http://127.0.0.1:${p}`;
+        if (attempts > 0) log(`🖥️ 控制台已改用新端口: ${base}/?token=${cfg.consoleToken.slice(0, 8)}…`);
+        else log(`🖥️ 控制台已启动: ${base}/?token=${cfg.consoleToken.slice(0, 8)}…（完整 token 在 config.json 的 consoleToken）`);
+        resolve(server);
+      });
+    };
+    tryListen(port);
   });
 }
 
