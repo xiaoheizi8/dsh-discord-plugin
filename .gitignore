@@ -5,3 +5,5 @@ state/
 
 .workbuddy/
 console-ui/node_modules/dist/
+
+dist/
