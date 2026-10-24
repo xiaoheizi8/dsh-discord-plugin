@@ -1,19 +1,21 @@
 <div align="center">
 
-# 🤖 dsh-discord-plugin
+<img src="assets/logo.svg" width="132" alt="dsh-discord-plugin logo"/>
 
-**把 DeepSeek Harness（DSH）会话接入 Discord 的桥接插件**
+# dsh-discord-plugin
 
-Discord 频道里发消息 → DSH agent 处理 → 回复 / 提问 / 审批原样回到 Discord
+**让 DSH agent 住进你的 Discord 服务器**
+
+频道里发消息它就聊 · 图片能看懂 · 提问出按钮 · 审批点点点
 
 ![Node](https://img.shields.io/badge/node-%E2%89%A522.13-339933?logo=node.js&logoColor=white)
 ![DSH](https://img.shields.io/badge/DSH-0.2.1-4D6BFF)
 ![Discord.js](https://img.shields.io/badge/discord.js-v14-5865F2?logo=discord&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-协议与架构参考 [Derpyu520/qq-bridge](https://github.com/Derpyu520/qq-bridge)（QQ 版桥接）· Discord 侧全新实现 · 不依赖 SnowLuma/OneBot
-
 </div>
+
+> **一句话**：这是 DeepSeek Harness（DSH）与 Discord 之间的桥——你在 Discord 说话，本地 DSH agent 干活，回复、追问、工具审批全部以 Discord 原生交互回流。协议层对齐 [Derpyu520/qq-bridge](https://github.com/Derpyu520/qq-bridge)，Discord 侧全新实现。
 
 ---
 
