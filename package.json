@@ -1,0 +1,20 @@
+{
+  "name": "dsh-discord-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Bridge between Discord and DeepSeek Harness Web API: Discord messages become DSH agent prompts, agent replies go back to Discord. Self-contained DSH client (offline cookie minting + slash RPC + remote.mux), adapted from Derpyu520/qq-bridge.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "node src/bridge.mjs",
+    "setup-dsh": "node scripts/setup-dsh.mjs",
+    "self-test": "node scripts/self-test.mjs"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "js-yaml": "^4.1.0"
+  }
+}
