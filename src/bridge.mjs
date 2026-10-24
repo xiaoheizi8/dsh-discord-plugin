@@ -22,6 +22,7 @@ import {
 } from 'discord.js';
 import { NodeApiClient, createTurnCollector, unwrap } from './dsh-client.mjs';
 import { chunkForDiscord, normalizeDiscordText } from './discord-format.mjs';
+import { startConsole } from './console.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -29,14 +30,17 @@ const STATE_DIR = path.join(ROOT, 'state');
 
 // ── 配置 ────────────────────────────────────────────────────────────────────
 
+const CONFIG_PATH = process.env.CONFIG_PATH || path.join(ROOT, 'config.json');
+const cfg = {};
+
 function loadConfig() {
-  const configPath = process.env.CONFIG_PATH || path.join(ROOT, 'config.json');
-  if (!fs.existsSync(configPath)) {
-    console.error(`缺少配置文件：${configPath}`);
+  if (!fs.existsSync(CONFIG_PATH)) {
+    console.error(`缺少配置文件：${CONFIG_PATH}`);
     console.error('请先复制 config.example.json 为 config.json 并填写 discord.token。');
     process.exit(1);
   }
-  const cfg = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  const loaded = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+  Object.assign(cfg, loaded);
   cfg.discord = cfg.discord ?? {};
   cfg.dsh = cfg.dsh ?? {};
   cfg.dsh.baseUrl = cfg.dsh.baseUrl || 'http://127.0.0.1:3080';
@@ -49,13 +53,45 @@ function loadConfig() {
   cfg.maxMediaBytes = cfg.maxMediaBytes ?? 8 * 1024 * 1024;
   cfg.maxMediaCount = cfg.maxMediaCount ?? 5;
   cfg.pollIntervalMs = cfg.pollIntervalMs ?? 5000;
+  cfg.consolePort = cfg.consolePort ?? 3100;
+  cfg.consoleToken = cfg.consoleToken ?? '';
   return cfg;
 }
 
-const cfg = loadConfig();
+const cfgLoaded = loadConfig();
+
+/** 持久化 config.json（控制台改配置时调用；会话映射走 saveState）。 */
+function saveConfigJson() {
+  try {
+    fs.writeFileSync(CONFIG_PATH, JSON.stringify(cfg, null, 2));
+  } catch (error) {
+    log('写回 config.json 失败:', error?.message ?? error);
+  }
+}
+
+// 控制台日志环形缓冲（最近 500 条，/api/logs 消费）
+const logsRing = (() => {
+  const buf = [];
+  const MAX = 500;
+  let seq = 0;
+  let dropped = 0;
+  return {
+    push(msg) {
+      buf.push({ seq: seq++, t: new Date().toISOString(), msg });
+      if (buf.length > MAX) { buf.shift(); dropped += 1; }
+    },
+    entries(since) {
+      const items = Number.isFinite(since) && since >= 0 ? buf.filter((e) => e.seq > since) : [...buf];
+      return { items, last: seq - 1 };
+    },
+    get dropped() { return dropped; },
+  };
+})();
 
 function log(...args) {
-  console.log(new Date().toISOString(), ...args);
+  const msg = args.map((a) => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ');
+  console.log(new Date().toISOString(), msg);
+  logsRing.push(msg);
 }
 
 // ── 状态持久化 ──────────────────────────────────────────────────────────────
@@ -760,6 +796,26 @@ async function main() {
     process.exit(1);
   }
   clearTimeout(loginHint);
+
+  // 本地控制台（SnowLuma 风格 WebUI）：只监听 127.0.0.1
+  try {
+    await startConsole({
+      cfg,
+      saveConfig: saveConfigJson,
+      state,
+      reverse,
+      collectors,
+      pendingQueues,
+      retireSession,
+      logsRing,
+      discord,
+      api,
+      isDshDown: () => dshDown,
+    });
+  } catch (error) {
+    log('控制台启动失败（不影响桥接）:', error?.message ?? error);
+  }
+
   pumpMux().catch((error) => {
     log('事件泵退出:', error?.message ?? error);
     process.exitCode = 1;

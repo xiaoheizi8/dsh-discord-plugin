@@ -11,7 +11,9 @@
   "scripts": {
     "start": "node --use-system-ca src/bridge.mjs",
     "setup-dsh": "node scripts/setup-dsh.mjs",
-    "self-test": "node scripts/self-test.mjs"
+    "self-test": "node scripts/self-test.mjs",
+    "build:console": "cd console-ui && npm install && npm run build",
+    "test:console": "node scripts/test-console-api.mjs"
   },
   "dependencies": {
     "discord.js": "^14.16.3",

@@ -57,6 +57,21 @@ flowchart LR
 
 </details>
 
+## 🖥️ 可视化控制台
+
+桥接进程内置 SnowLuma 风格的本地 WebUI（React 构建），启动后自动监听 **`http://127.0.0.1:3100`**：
+
+| 页签 | 功能 |
+|---|---|
+| **仪表盘** | Discord/DSH 在线状态、活跃会话数、排队数、已接入服务器 |
+| **白名单** | 服务器/频道/用户三级白黑名单可视化增删，保存即**热生效**（无需重启桥接） |
+| **会话** | 所有活跃会话列表（回合中/空闲/排队数），一键重置 |
+| **人格** | 可视化编辑 persona 前缀，保存自动重渲染 DSH bundle（重启 DSH 后生效） |
+| **日志** | 桥接日志实时滚动（最近 500 条），支持暂停/清屏 |
+
+- **安全**：只监听 `127.0.0.1`，API 需要 `consoleToken`（首次启动自动生成写入 config.json）；第一次访问用 `http://127.0.0.1:3100/?token=<consoleToken>`，之后浏览器会记住
+- 前端源码在 `console-ui/`（Vite + React），构建产物 `web/` 随仓库提交；改前端后跑 `npm run build:console`
+
 ## 📁 目录结构
 
 ```
@@ -65,11 +80,16 @@ flowchart LR
 │   ├── bridge.mjs           # 主程序：配置 / 状态 / 白名单 / 会话管理 / 事件泵 / 斜杠命令
 │   ├── dsh-client.mjs       # 自包含 DSH 客户端（Cookie 铸造 + 斜杠 RPC + remote.mux + turn collector）
 │   ├── discord-format.mjs   # 2000 字符分块（fence 配平）、提及/表情归一化
-│   └── proxy-bootstrap.mjs  # 代理引导：REST(undici) + 网关 WebSocket(ws)，127.0.0.1 直连
+│   ├── proxy-bootstrap.mjs  # 代理引导：REST(undici) + 网关 WebSocket(ws)，127.0.0.1 直连
+│   ├── console.mjs          # 本地控制台：HTTP 服务器 + REST API + 静态托管 web/
+│   └── preset-build.mjs     # preset 源 → DSH bundle patch 渲染（setup 与控制台共用）
+├── 📂 console-ui/           # 控制台前端源码（Vite + React）
+├── 📂 web/                  # 控制台构建产物（随仓库提交，clone 即用）
 ├── 📂 dsh/agent-presets/discord-chat/   # 最小权限 preset 源文件（无任何本地工具）
 ├── 📂 scripts/
 │   ├── setup-dsh.mjs        # 从源渲染 patch，以 bundle 机制注册进 DSH profile（幂等）
-│   └── self-test.mjs        # 离线自测（10 例，不需要 Discord/DSH）
+│   ├── self-test.mjs        # 离线自测（10 例，不需要 Discord/DSH）
+│   └── test-console-api.mjs # 控制台 API 端到端回归（15 例）
 └── 📂 state/                # 运行时数据（不入库）：sessions.json + 会话工作目录
 ```
 
