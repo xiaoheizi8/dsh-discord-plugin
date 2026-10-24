@@ -11,6 +11,9 @@ if (params.get('token')) {
 async function request(path, options = {}) {
   const res = await fetch(path, {
     ...options,
+    // 8 秒超时兜底：keep-alive 竞态等网络异常时 fetch 可能永远 pending，
+    // 不设超时会卡死 usePolling 的重入锁，页面永远"连接中"
+    signal: AbortSignal.timeout(8000),
     headers: {
       'content-type': 'application/json',
       authorization: `Bearer ${TOKEN}`,

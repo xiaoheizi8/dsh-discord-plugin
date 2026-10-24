@@ -60,6 +60,8 @@ export function startConsole(ctx) {
           resolve(null);
         }
       });
+      server.keepAliveTimeout = 65_000;   // 大于浏览器 keep-alive：不让服务端先关连接（否则竞态导致浏览器请求黑洞挂死）
+      server.headersTimeout = 66_000;     // 必须略大于 keepAliveTimeout
       server.listen(p, '127.0.0.1', () => {
         const url = `http://127.0.0.1:${p}/?token=${cfg.consoleToken}`;
         log(`🖥️ 控制台已启动，一键访问（含令牌，浏览器会记住）：${url}`);
@@ -84,7 +86,12 @@ function serveStatic(req, res, url) {
     res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
     return res.end('控制台前端未构建：请运行 npm run build:console（产物输出到 web/）');
   }
-  res.writeHead(200, { 'content-type': MIME[path.extname(full)] ?? 'application/octet-stream' });
+  const isHtml = full.endsWith('.html');
+  res.writeHead(200, {
+    'content-type': MIME[path.extname(full)] ?? 'application/octet-stream',
+    // index.html 不缓存（保证引用最新 hash 的资源）；带 hash 的静态资源可以长缓存
+    'cache-control': isHtml ? 'no-cache' : 'public, max-age=86400',
+  });
   fs.createReadStream(full).pipe(res);
 }
 
