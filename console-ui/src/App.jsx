@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import { TOKEN } from './api.js';
+import { StatusProvider } from './hooks/useStatus.jsx';
 import Layout from './components/Layout.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Whitelist from './pages/Whitelist.jsx';
@@ -44,7 +45,13 @@ function ErrorBoundary() {
 const router = createBrowserRouter([
   {
     path: '/',
-    element: TOKEN ? <Layout /> : <TokenGate />,
+    element: TOKEN ? (
+      <StatusProvider>
+        <Layout />
+      </StatusProvider>
+    ) : (
+      <TokenGate />
+    ),
     errorElement: <ErrorBoundary />,
     children: [
       { index: true, element: <Dashboard /> },

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useStatus } from '../hooks/useStatus.js';
+import { useStatus } from '../hooks/useStatus.jsx';
 import { Card, PageHeader, StatusDot, CopyButton } from '../components/ui.jsx';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';

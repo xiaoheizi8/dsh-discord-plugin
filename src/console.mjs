@@ -44,7 +44,7 @@ export function startConsole(ctx) {
         const u = new URL(req.url, 'http://127.0.0.1');
         try {
           if (u.pathname.startsWith('/api/')) return await handleApi(req, res, u, ctx);
-          return serveStatic(req, res, u);
+          return serveStatic(req, res, u, log);
         } catch (error) {
           res.writeHead(500, { 'content-type': 'application/json; charset=utf-8' });
           res.end(JSON.stringify({ error: error?.message ?? String(error) }));
@@ -74,7 +74,7 @@ export function startConsole(ctx) {
 
 // ── 静态文件 ────────────────────────────────────────────────────────────────
 
-function serveStatic(req, res, url) {
+function serveStatic(req, res, url, log) {
   let file = url.pathname === '/' ? '/index.html' : url.pathname;
   file = path.normalize(file).replace(/^(\.\.[/\\])+/, '');
   let full = path.join(WEB_DIR, file);
@@ -86,6 +86,7 @@ function serveStatic(req, res, url) {
     res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
     return res.end('控制台前端未构建：请运行 npm run build:console（产物输出到 web/）');
   }
+  if (full.endsWith('.html') && log) log('🖥️ 控制台页面加载（浏览器打开或刷新）');
   const isHtml = full.endsWith('.html');
   res.writeHead(200, {
     'content-type': MIME[path.extname(full)] ?? 'application/octet-stream',
